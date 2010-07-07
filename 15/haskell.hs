@@ -1,34 +1,26 @@
-{-# LANGUAGE BangPatterns #-}
+import qualified Data.Map as M
 
-import Data.List
-import Data.Set (Set)
-import qualified Data.Set as Set
+data Pair a b = Pair !a !b
 
-{-
-No loops by definition means we are *always* on the possible track while in bounds
-Amount of options varies depending on whether we are on edge or not
-There is always a symmetry 
--}
+moves :: Pair Int Int -> Int
+moves (Pair 0 0) = 1
+moves (Pair 0 y) = 1
+moves (Pair x 0) = 1
+moves (Pair x y)
+    | x == y    = 2*(moves (Pair (x-1) y))
+    | otherwise = (moves (Pair (x-1) y)) + (moves (Pair x (y-1)))
 
-deadzone s = Set.fromList $ [(x,y) | x <- [0..(s-1)], y <- [-1,s]]
-           ++ [(x,y) | y <- [0..(s-1)], x <- [-1,s]]
 
-moves dz p f
-    | p == f = 1
-    | Set.member p dz = 0
-    | otherwise = (moves dz' (movedown p) f) +
-                  (moves dz' (moveright p) f)
---                  (moves dz' (moveup p) f) +
---                  (moves dz' (moveleft p) f) + 
-                      where dz' = Set.insert p dz
+paths n = m where 
+    m = M.fromList [((x,y),p x y) | x <- [0..n], y <- [0..n]]
+    p 0 0 = 1
+    p 0 _ = 1
+    p _ 0 = 1
+    p x y = (m M.! (x-1, y)) + (m M.! (x, y-1))
 
-movedown (x,y) = (x,y+1)
-moveright (x,y) = (x+1,y)
 
---moveup (x,y) = (x,y-1)
---moveleft (x,y) = (x-1,y)
+solve1 n = moves (Pair n n)
 
-solve1 = moves (deadzone $ n+1) (0,0) (n,n)
-    where n = 10
+solve2 n = (paths n) M.! (n,n)
 
-main = putStrLn $ show solve1
+main = putStrLn $ show $ solve2 20
