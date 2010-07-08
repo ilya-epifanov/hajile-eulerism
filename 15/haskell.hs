@@ -7,7 +7,6 @@ import qualified Data.Set as Set
 {-
 No loops by definition means we are *always* on the possible track while in bounds
 Amount of options varies depending on whether we are on edge or not
-There is always a symmetry 
 -}
 
 deadzone s = Set.fromList $ [(x,y) | x <- [0..(s-1)], y <- [-1,s]]
